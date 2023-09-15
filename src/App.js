@@ -1,12 +1,12 @@
 import logo from './logo.svg';
 import './App.css';
+import Card from './components/Card';
 
 function App() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline text-red-700">
-        Hello world!
-      </h1>
+    <div className='flex justify-center'>
+      <Card />
+      <div>Card form</div>
     </div>
   );
 }
