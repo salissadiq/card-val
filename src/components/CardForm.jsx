@@ -7,12 +7,13 @@ export default function CardForm(props) {
     const handleInputChange = (e) => {
         props.handleCardDetails(e)
     }
+
     return (
         <div className='flex flex-col font-mono'>
             <div className='my-10 text-2xl'>
                 <h2>Payment details</h2>
             </div>
-            <form action="">
+            <form onSubmit={props?.pay} >
                 <div className='flex flex-col'>
                     <label htmlFor="" className='text-sm font-light'>CARDHOLDER NAME</label>
                     <div className='flex gap-2 items-center'>
@@ -52,7 +53,9 @@ export default function CardForm(props) {
                         </div>
                     </div>
                 </div>
-
+                <div className='flex justify-center'>
+                    <button className='bg-red-500 py-2 px-3 rounded-md text-white'>Pay now</button>
+                </div>
             </form>
         </div>
     )

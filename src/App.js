@@ -19,11 +19,15 @@ function App() {
       }
     })
   }
+  const payHandler = (e) => {
+    e.preventDefault();
+
+  }
   console.log(carddetails);
   return (
     <div className='flex justify-center gap-10 items-center mt-[200px]'>
       <Card carddetails={carddetails} />
-      <CardForm handleCardDetails={handleCardDetails} />
+      <CardForm handleCardDetails={handleCardDetails} pay={payHandler} />
     </div>
   );
 }
