@@ -1,37 +1,108 @@
-function validateCreditCard(cardNumber, expiryMonth, expiryYear) {
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
+//This file contain utils functions for credit card validation
 
-    const masterCardRegex = /^5[1-5][0-9]{14}$/;
-    const visaRegex = /^4[0-9]{12}(?:[0-9]{3})?$/;
-    const americanExpressRegex = /^3[47][0-9]{13}$/;
 
-    const isCardNumberValid =
-        masterCardRegex.test(cardNumber) ||
-        visaRegex.test(cardNumber) ||
-        americanExpressRegex.test(cardNumber);
+//This function for checks for valid card number using Luhn algorithm 
+exports.validateCardNumber = (cardNumber) => {
+    // Remove any non-digit characters
+    const cleanedCardNumber = cardNumber.replace(/\D/g, '');
 
-    const isExpiryValid =
-        !isNaN(expiryMonth) &&
-        !isNaN(expiryYear) &&
-        expiryMonth >= 1 &&
-        expiryMonth <= 12 &&
-        expiryYear >= currentYear &&
-        (expiryYear > currentYear || expiryMonth >= currentMonth);
-
-    let cardType = "Unknown";
-    if (masterCardRegex.test(cardNumber)) {
-        cardType = "MasterCard";
-    } else if (visaRegex.test(cardNumber)) {
-        cardType = "Visa";
-    } else if (americanExpressRegex.test(cardNumber)) {
-        cardType = "American Express";
+    // Check if the card number is composed of digits only
+    if (!/^\d+$/.test(cleanedCardNumber)) {
+        return false;
     }
 
-    return {
-        isCardNumberValid,
-        isExpiryValid,
-        cardType,
-    };
+    // Check the card number length (between 13 and 19 digits)
+    if (cleanedCardNumber.length < 13 || cleanedCardNumber.length > 19) {
+        return false;
+    }
+
+    // Luhn algorithm to validate the credit card number
+    let sum = 0;
+    let doubleUp = false;
+
+    for (let i = cleanedCardNumber.length - 1; i >= 0; i--) {
+        let digit = parseInt(cleanedCardNumber.charAt(i), 10);
+
+        if (doubleUp) {
+            if ((digit *= 2) > 9) digit -= 9;
+        }
+
+        sum += digit;
+        doubleUp = !doubleUp;
+    }
+
+    return sum % 10 === 0;
 }
-module.exports = validateCreditCard
+
+//This function Detect the credit card type e.g. MasterCard, Visa, and American Express
+exports.detectCardType = (cardNumber) => {
+
+    //Regex for masterCard
+    const masterCardRegex = /^5[1-5][0-9]{14}$/;
+
+    //regex for Visa
+    const visaRegex = /^4[0-9]{12}(?:[0-9]{3})?$/;
+
+    //Regex for American Express
+    const americanExpressRegex = /^3[47][0-9]{13}$/;
+
+    //The below condition Detect the type of credit card by using the above Regex for each card type
+    if (masterCardRegex.test(cardNumber)) {
+        return "MasterCard";
+    } else if (visaRegex.test(cardNumber)) {
+        return "Visa";
+    } else if (americanExpressRegex.test(cardNumber)) {
+        return "American Express";
+    } else {
+        return "Unknown";
+    }
+}
+
+
+//This function validate card expiry date
+exports.validateExpiryDate = (expiryMonth, expiryYear) => {
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1; // + 1 is added because January is 0 in JavaScript
+
+    //This condition checks if card has expired.
+    //False will be returned if the card has expired
+    //Otherwwise true will be returned
+    if (
+        isNaN(expiryMonth) ||
+        isNaN(expiryYear) ||
+        expiryMonth < 1 ||
+        expiryMonth > 12 ||
+        expiryYear < currentYear ||
+        (expiryYear === currentYear && expiryMonth < currentMonth)
+    ) {
+        return false;
+    }
+
+    return true;
+}
+
+//This is the function that validate card CVV based on card type
+//MasterCard and Visa has 3 digits CVV while American Express has 4 digits
+//False will be returned if the Cvv is Invalid
+//Otherwise true will be returned
+exports.validateCVV = (cardType, cvv) => {
+    let cvvLength;
+
+    // Determine the CVV length based on card type
+    switch (cardType) {
+        case 'Visa':
+            cvvLength = 3; // CVV for Visa is 3 digits
+            break;
+        case 'MasterCard':
+            cvvLength = 3; // CVV for MasterCard is 3 digits
+            break;
+        case 'American Express':
+            cvvLength = 4; // CVV for American Express is 4 digits
+            break;
+        default:
+            return false; // Unknown card type
+    }
+
+    // Check if CVV is numeric and has the correct length
+    return /^\d+$/.test(cvv) && cvv.length === cvvLength;
+}
