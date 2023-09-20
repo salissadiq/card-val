@@ -6,40 +6,37 @@ This web application validates credit card details, including card numbers, expi
 
 Both the backend and frontend are part of this project and are located in the same directory.
 
-### Install Dependencies
+### Install Dependencies and start servers
 
 1. Open a terminal and navigate to the project directory:
-    ```bash
-    cd card-validation
-    ```
+```bash
+cd card-validation
+```
 
 2. Install backend dependencies using npm:
-    ```bash
-    cd backend
-    npm install
-    ```
-
-3. Install frontend dependencies using npm:
-    ```bash
-    cd frontend
-    npm install
-    ```
-
-### Start the Servers
-
-#### Backend (Express.js)
-
-To start the backend server:
-
 ```bash
 cd backend
+npm install
+```
+3. To start the backend server:
+
+```bash
 npm start
+```
+
 The backend server will run on http://localhost:5000.
 
-Frontend (React.js)
-To start the React development server: (change directory to the project root directory 'card-validation' )
+4. Open new terminal to  Install frontend dependencies using npm:
+
+```bash
 cd card-validation
+npm install
+```
+
+5. To start the backend server:
+```bash
 npm start
+```
 
 The development server will run on http://localhost:3000.
 
