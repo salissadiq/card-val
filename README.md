@@ -33,7 +33,7 @@ cd card-validation
 npm install
 ```
 
-5. To start the backend server:
+5. To start the frontend server:
 ```bash
 npm start
 ```
