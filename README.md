@@ -52,3 +52,4 @@ The Credit validation algorithm Uses the renown Luhn algorithm the particular im
 
 ### Invalid credit card validation image
 ![Image on invalid card](./public/invalid.png)
+
