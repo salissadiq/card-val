@@ -16,7 +16,7 @@ exports.validateCardNumber = (cardNumber) => {
         return false;
     }
 
-    // Luhn algorithm to validate the credit card number
+    // This is where i used Luhn algorithm to validate the credit card number
     let sum = 0;
     let doubleUp = false;
 
