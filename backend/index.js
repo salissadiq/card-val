@@ -1,104 +1,67 @@
+// Importing the 'express' library, which simplifies creating a server and API end points in Node.js
 const express = require('express');
+
+// Importing 'body-parser' to parse incoming request bodies form the client in a middleware
 const bodyParser = require('body-parser');
-const { detectCardType, validateCardNumber, validateExpiryDate, validateCVV } = require('./utils/validateCard')
+
+// Importing 'cors' to enable Cross-Origin Resource Sharing for the server
+const cors = require('cors');
+
+// Importing functions from a custom module for validating credit card details
+const { detectCardType, validateCardNumber, validateExpiryDate, validateCVV } = require('./utils/validateCard');
+
+// Creating an instance of the express application
 const app = express();
+
+// Enabling Cross-Origin Resource Sharing
+app.use(cors());
+
+// Parsing incoming request bodies as JSON
 app.use(bodyParser.json());
 
-
-
-
-
+// Endpoint to handle a POST request to validate card details
 app.post('/validate-card', (req, res) => {
+    // Extracting card details from the request body
     const { cardNumber, cardHolder, expiryMonth, expiryYear, cvv } = req.body;
 
+    // Checking if all required card fields are provided from the client
     if (!cardNumber || !cardHolder || !expiryMonth || !expiryYear || !cvv) {
         return res.status(400).send('All the card fields are required.');
     }
 
+    // Validating the card number (this is the function that uses luhn algorith for card validation)
     const isCardValid = validateCardNumber(cardNumber);
+
+    // Validating the expiry date
     const isExpiryValid = validateExpiryDate(parseInt(expiryMonth), parseInt(expiryYear));
+
+    // Detecting the card type (Visa, MasterCard, American Express, or Unknown)
     const cardType = detectCardType(cardNumber);
+
+    // Validating the CVV based on the card type
     const isCvvValid = validateCVV(cardType, cvv);
+
+    // Constructing the response object
     const response = {
         isCardValid,
         cardType,
         isExpiryValid,
         isCvvValid,
     };
+
+    // Handling invalid card details with appropriate response and status code
     if (!isCardValid || !isExpiryValid || cardType === 'Unknown' || !isCvvValid) {
-        return res.status(400).json(response)
+        return res.status(400).json(response);
     }
+
+    // Sending the response with valid card details
     res.json(response);
 });
 
+// Defining the port to run the server, defaulting to 5000 if not provided
 const PORT = process.env.PORT || 5000;
+
+// Starting the server and listening on the defined port
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
-// const express = require('express');
-// const bodyParser = require('body-parser');
-// const app = express();
-
-// // Middleware to parse JSON requests
-// app.use(bodyParser.json());
-
-// // Luhn algorithm to validate credit card numbers
-// function isLuhnValid(cardNumber) {
-//     let sum = 0;
-//     let shouldDouble = false;
-
-//     // Iterate through each digit in reverse order
-//     for (let i = cardNumber.length - 1; i >= 0; i--) {
-//         let digit = parseInt(cardNumber[i], 10);
-
-//         if (shouldDouble) {
-//             digit *= 2;
-//             if (digit > 9) {
-//                 digit -= 9;
-//             }
-//         }
-
-//         sum += digit;
-//         shouldDouble = !shouldDouble;
-//     }
-
-//     return sum % 10 === 0;
-// }
-
-// // Express endpoint to validate credit card details
-// app.post('/validate-credit-card', (req, res) => {
-//     const { cardNumber, cardHolder, expiryDate, cvv } = req.body;
-
-//     // Validate card number using Luhn algorithm
-//     const isCardNumberValid = isLuhnValid(cardNumber);
-
-//     // Check card type based on the first digit of the card number
-//     const cardType = cardNumber.startsWith('4') ? 'Visa' :
-//         cardNumber.startsWith('5') ? 'MasterCard' :
-//             cardNumber.match(/^3[47]/) ? 'American Express' :
-//                 'Unknown';
-
-//     // Dummy expiry date validation (you should implement a proper validation)
-//     // const isExpiryValid = expiryDate.match(/^(0[1-9]|1[0-2])\/\d{2}$/);
-
-//     // Dummy CVV validation (you should implement a proper validation)
-//     // const isCvvValid = cvv.match(/^\d{3,4}$/);
-
-//     // Construct the response based on validation results
-//     const response = {
-//         isCardNumberValid,
-//         cardType,
-//         // isExpiryValid,
-//         // isCvvValid,
-//         cardHolder
-//     };
-
-//     res.json(response);
-// });
-
-// // Start the server
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => {
-//     console.log(`Server is listening on port ${PORT}`);
-// });

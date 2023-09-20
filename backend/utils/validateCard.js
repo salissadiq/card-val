@@ -48,7 +48,7 @@ exports.detectCardType = (cardNumber) => {
 
     //The below condition Detect the type of credit card by using the above Regex for each card type
     if (masterCardRegex.test(cardNumber)) {
-        return "MasterCard";
+        return "Master Card";
     } else if (visaRegex.test(cardNumber)) {
         return "Visa";
     } else if (americanExpressRegex.test(cardNumber)) {
@@ -60,25 +60,17 @@ exports.detectCardType = (cardNumber) => {
 
 
 //This function validate card expiry date
+//It uses last two digits of the year and check if both month and year are in future
 exports.validateExpiryDate = (expiryMonth, expiryYear) => {
-    const currentYear = new Date().getFullYear();
+
+    const currentYear = new Date().getFullYear() % 100; // Get the last two digits of the current year
     const currentMonth = new Date().getMonth() + 1; // + 1 is added because January is 0 in JavaScript
+    // This check if expiry month and year are valid and in the future
+    const isMonthValid = !isNaN(expiryMonth) && expiryMonth >= 1 && expiryMonth <= 12 && expiryMonth >= currentMonth;
+    const isYearValid = !isNaN(expiryYear) && expiryYear >= currentYear;
 
-    //This condition checks if card has expired.
-    //False will be returned if the card has expired
-    //Otherwwise true will be returned
-    if (
-        isNaN(expiryMonth) ||
-        isNaN(expiryYear) ||
-        expiryMonth < 1 ||
-        expiryMonth > 12 ||
-        expiryYear < currentYear ||
-        (expiryYear === currentYear && expiryMonth < currentMonth)
-    ) {
-        return false;
-    }
-
-    return true;
+    // If both month and year are valid and both are in the future, return true
+    return isMonthValid && isYearValid;
 }
 
 //This is the function that validate card CVV based on card type
@@ -93,7 +85,7 @@ exports.validateCVV = (cardType, cvv) => {
         case 'Visa':
             cvvLength = 3; // CVV for Visa is 3 digits
             break;
-        case 'MasterCard':
+        case 'Master Card':
             cvvLength = 3; // CVV for MasterCard is 3 digits
             break;
         case 'American Express':
@@ -104,5 +96,6 @@ exports.validateCVV = (cardType, cvv) => {
     }
 
     // Check if CVV is numeric and has the correct length
+    //return true if the cvv has a valid length based on card type
     return /^\d+$/.test(cvv) && cvv.length === cvvLength;
 }
